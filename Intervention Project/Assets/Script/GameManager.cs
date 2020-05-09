@@ -1,12 +1,47 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
+    string[] allQuestionsAnswers = {"I'll call you in an hour",
+        "Let's do a zoom movie night!",
+        "We can meet on Discord at 4",
+        "Let's make a group chat",
+         "What time can you call?", "Anyone want to meet over zoom"
+
+
+    };
+
+    string[] generalQuestions = { "What time can you call?", "Anyone want to meet over zoom" };
+    string[] generalResponses = {"I'll call you in an hour",
+        "Let's do a zoom movie night!",
+        "We can meet on Discord at 4",
+        "Let's make a group chat",
+        "What game are you playing?",
+        "Can I talk to you about the assignment later?",
+        "Do you want to work on the assignment together?",
+        "We can work on the assignment together"
+    };
+
+    string[] teacherResponses = { "Can't wait to see you all again!"
+    };
+
+    string[] gameQuestions = { "What game are you playing?"
+    };
+    string[] gameRespones = { "I love that game!"
+    };
+
+    string[] schoolQuestions = {"Can I talk to you about the assignment later?",
+        "Do you want to work on the assignment together?"};
+    string[] schoolRespones = { "We can work on the assignment together" };
+
+
+
     public string userName;
-    private int maxMessage = 25;
+    private int maxMessage = 50;
 
     public GameObject chatPanel, textObject;
     public InputField chatBox;
@@ -19,15 +54,19 @@ public class GameManager : MonoBehaviour {
     float timeStart;
     int currentHour = 12;
     int lastHour;
+
+    int currentMessageCount = 0;
+    int previousMessageCount = 0;
     void Start() {
 
     }
 
     // Update is called once per frame
     void Update() {
+        checkMessageAndResponse();
         if (chatBox.text != "") {
             if (Input.GetKeyDown(KeyCode.Return)) {
-                SendMessageToChat(userName + ": " +chatBox.text, Message.MessageType.playerMessage);
+                SendMessageToChat(userName + ": " + chatBox.text, Message.MessageType.playerMessage);
                 chatBox.text = "";
             }
         }
@@ -65,8 +104,38 @@ public class GameManager : MonoBehaviour {
             currentHour++;
         }
     }
+    void checkMessageAndResponse() {
+        bool checkForBot = false;
+        if (currentMessageCount > previousMessageCount) {
+            // we will check the messages, go through the last message and provide a response to it.
+            string messageCheck = messageList[currentMessageCount].ToString().ToLower();
+            
+            for (int i = 0; i < allQuestionsAnswers.Length; i++) {
+                if (messageCheck.Contains(allQuestionsAnswers[i])) {
+                    checkForBot = true;
+                }
+            }
+            if (checkForBot != true) {
+                if (messageCheck.Contains("?")) {
+                    if (messageCheck.Contains("game")) {
+                        SendMessageToChat("BOT: I AM PLAYING THE FOUNDER BEEP BOOP", Message.MessageType.info);
+                    }
+                    if (messageCheck.Contains("assignment")) {
 
+                    }
+                    else {
+
+                    }
+                }
+                else {
+
+                }
+            }
+            // will need to create a function to make sure that the previous message was not sent by the bot.
+        } // end of messageChecker
+    }
     public void SendMessageToChat(string text, Message.MessageType messageType) {
+        currentMessageCount++;
         if (messageList.Count >= maxMessage) {
             messageList.Remove(messageList[0]);
             // need to Destroy the game object because if only remove from message list the game object will still exist.
@@ -82,6 +151,8 @@ public class GameManager : MonoBehaviour {
         newMessage.textObject.color = MessageTypeColor(messageType);
 
         messageList.Add(newMessage);
+
+        Debug.Log(messageList.Count);
     }
 
     Color MessageTypeColor(Message.MessageType messageType) {
