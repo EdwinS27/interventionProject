@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
-    string[] allQuestionsAnswers = {"I'll call you in an hour",
+    string[] allQuestionsAnswers = {
+        "I'll call you in an hour",
         "Let's do a zoom movie night!",
         "We can meet on Discord at 4",
         "Let's make a group chat",
-         "What time can you call?", "Anyone want to meet over zoom"
-
-
+        "What time can you call?",
+        "Anyone want to meet over zoom"
     };
 
     string[] generalQuestions = { "What time can you call?", "Anyone want to meet over zoom" };
@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        checkMessageAndResponse();
+        BotCheckMessageAndRespond();
         if (chatBox.text != "") {
             if (Input.GetKeyDown(KeyCode.Return)) {
                 SendMessageToChat(userName + ": " + chatBox.text, Message.MessageType.playerMessage);
@@ -104,24 +104,43 @@ public class GameManager : MonoBehaviour {
             currentHour++;
         }
     }
-    void checkMessageAndResponse() {
+    // This will be the game class mate
+    void BotCheckMessageAndRespond() {
         bool checkForBot = false;
+        // When a new message comes in we want to check that message and have the "BOT" respond
         if (currentMessageCount > previousMessageCount) {
-            // we will check the messages, go through the last message and provide a response to it.
-            string messageCheck = messageList[currentMessageCount].ToString().ToLower();
-            
-            for (int i = 0; i < allQuestionsAnswers.Length; i++) {
-                if (messageCheck.Contains(allQuestionsAnswers[i])) {
-                    checkForBot = true;
-                }
+            // A easier way of telling who is sending the message is by checking the message type.
+            // If the message type was from anyone but player then it should continue with this method.
+            // each message will be put into this messageCheck variable after its put into the system.
+            string messageCheck = messageList[currentMessageCount - 1].text;
+            if (messageList[currentMessageCount - 1].messageType == Message.MessageType.playerMessage) {
+                Debug.Log("The player sent a message") ;
             }
+            else {
+                Debug.Log("The player did not send a message");
+            }
+
+            for (int i = 0; i < allQuestionsAnswers.Length; i++) {
+                if (messageCheck.Contains(allQuestionsAnswers[i].ToLower())) {
+                    checkForBot = true;
+                    Debug.Log("Check for Bot was true");
+                }
+                if (checkForBot) {
+                    break;
+                }
+                Debug.Log("Checking the array of all questions and answers, this is the current number : " + i);
+            }
+
             if (checkForBot != true) {
+                Debug.Log("Check for Bot was not true");
+                // checking that the message had a question mark
                 if (messageCheck.Contains("?")) {
-                    if (messageCheck.Contains("game")) {
-                        SendMessageToChat("BOT: I AM PLAYING THE FOUNDER BEEP BOOP", Message.MessageType.info);
+                    Debug.Log("Check Message contains a ?");
+                    if (messageCheck.Contains("game") && messageCheck.Contains("playing")) {
+                        SendMessageToChat("Classmate: I am playing the founder", Message.MessageType.classMate);
                     }
                     if (messageCheck.Contains("assignment")) {
-
+                        SendMessageToChat("Classmate: I didn't know we had an assignment! \n RIP..", Message.MessageType.classMate);
                     }
                     else {
 
@@ -132,10 +151,10 @@ public class GameManager : MonoBehaviour {
                 }
             }
             // will need to create a function to make sure that the previous message was not sent by the bot.
-        } // end of messageChecker
+            previousMessageCount++;
+        } // end of if statement: messageChecker
     }
     public void SendMessageToChat(string text, Message.MessageType messageType) {
-        currentMessageCount++;
         if (messageList.Count >= maxMessage) {
             messageList.Remove(messageList[0]);
             // need to Destroy the game object because if only remove from message list the game object will still exist.
@@ -151,6 +170,7 @@ public class GameManager : MonoBehaviour {
         newMessage.textObject.color = MessageTypeColor(messageType);
 
         messageList.Add(newMessage);
+        currentMessageCount++;
 
         Debug.Log(messageList.Count);
     }
@@ -180,6 +200,6 @@ public class Message {
     public MessageType messageType;
 
     public enum MessageType {
-        playerMessage, info
+        playerMessage, info, classMate
     }
 }
