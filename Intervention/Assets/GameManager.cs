@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour {
+
     string[] allQuestionsAnswers = {
         "I'll call you in an hour",
         "Let's do a zoom movie night!",
@@ -42,7 +43,8 @@ public class GameManager : MonoBehaviour {
     public string userName;
     private int maxMessage = 50;
 
-    public GameObject slackMessageWindow, slackMessage, coverSlack;
+    public List<GameObject> messagingSystem;
+    public GameObject slackMessage, coverSlack, slackMessageProfessor, slackMessageClassmate;
     public InputField slackInputField;
 
     bool slackHidden = true;
@@ -56,11 +58,17 @@ public class GameManager : MonoBehaviour {
     int currentHour = 12;
     int lastHour;
 
+    int whoAmIMessaging = 0;
+
     int currentMessageCount = 0;
     int previousMessageCount = 0;
     // Start is called before the first frame update
     void Start() {
-
+        messagingSystem.Add(slackMessageClassmate);
+        messagingSystem.Add(slackMessageProfessor);
+        slackMessageClassmate.SetActive(false);
+        slackMessageProfessor.SetActive(true);
+        Debug.Log(messagingSystem.Count);
     }
 
     // Update is called once per frame
@@ -93,16 +101,24 @@ public class GameManager : MonoBehaviour {
 
         Message newMessage = new Message();
         newMessage.text = text;
-        GameObject newText = Instantiate(slackMessage, slackMessageWindow.transform);
+        Debug.Log(whoAmIMessaging);
 
-        newMessage.textObject = newText.GetComponent<Text>();
-        newMessage.textObject.text = newMessage.text;
-        newMessage.textObject.color = MessageTypeColor(messageType);
+        if (whoAmIMessaging == 0) {
+            GameObject newText = Instantiate(slackMessage, slackMessageProfessor.transform);
+            newMessage.textObject = newText.GetComponent<Text>();
+            newMessage.textObject.text = newMessage.text;
+            newMessage.textObject.color = MessageTypeColor(messageType);
+        }
+        else if (whoAmIMessaging == 1) {
+            GameObject newText = Instantiate(slackMessage, slackMessageClassmate.transform);
+            newMessage.textObject = newText.GetComponent<Text>();
+            newMessage.textObject.text = newMessage.text;
+            newMessage.textObject.color = MessageTypeColor(messageType);
+        }
+
 
         messageList.Add(newMessage);
         currentMessageCount++;
-
-        Debug.Log(messageList.Count);
     }
     Color MessageTypeColor(Message.MessageType messageType) {
         Color color = info;
@@ -119,6 +135,10 @@ public class GameManager : MonoBehaviour {
         }
         return color;
     }
+
+    private void trackWindow() {
+        
+    }
     private void trackMouse() {
         // https://kylewbanks.com/blog/unity-2d-detecting-gameobject-clicks-using-raycasts
         // How I learned to use raycast 2D
@@ -126,9 +146,27 @@ public class GameManager : MonoBehaviour {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
             Debug.Log("Mouse was clicked \n Mouse X: " + mousePos2D.x + " Mouse Y: " + mousePos2D.y);
+            // For hiding the Slack Window
             if (mousePos2D.x > -10 && mousePos2D.x < -6 && mousePos2D.y < 5 && mousePos2D.y > 3) {
                 slackHidden = !slackHidden;
                 coverSlack.SetActive(slackHidden);
+            }
+            // For hiding the Slack Window
+            if (mousePos2D.x > -7 && mousePos2D.x < -6 && mousePos2D.y < -2 && mousePos2D.y > -5) {
+                slackHidden = !slackHidden;
+                coverSlack.SetActive(slackHidden);
+            }
+            // For activating the professors chat
+            if (mousePos2D.x > -0.5f && mousePos2D.x < 1.5f && mousePos2D.y < 4.2f && mousePos2D.y > 4) {
+                slackMessageProfessor.SetActive(true);
+                slackMessageClassmate.SetActive(false);
+                whoAmIMessaging = 0;
+            }
+            // For activating the classmate one's chat
+            if (mousePos2D.x > -0.5f && mousePos2D.x < 1.5f && mousePos2D.y < 3.6f && mousePos2D.y > 3.4f) {
+                slackMessageProfessor.SetActive(false);
+                slackMessageClassmate.SetActive(true);
+                whoAmIMessaging = 1;
             }
         }
     } // end of getObject
