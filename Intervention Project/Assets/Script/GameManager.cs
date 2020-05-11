@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour {
 
     public GameObject chatPanel, textObject;
     public InputField chatBox;
+    public GameObject slackWindow;
 
     public Color playerMessage;
     public Color info;
@@ -58,11 +59,12 @@ public class GameManager : MonoBehaviour {
     int currentMessageCount = 0;
     int previousMessageCount = 0;
     void Start() {
-
+        //slackWindow = 
     }
 
     // Update is called once per frame
     void Update() {
+        getObject();
         BotCheckMessageAndRespond();
         if (chatBox.text != "") {
             if (Input.GetKeyDown(KeyCode.Return)) {
@@ -114,7 +116,7 @@ public class GameManager : MonoBehaviour {
             // each message will be put into this messageCheck variable after its put into the system.
             string messageCheck = messageList[currentMessageCount - 1].text;
             if (messageList[currentMessageCount - 1].messageType == Message.MessageType.playerMessage) {
-                Debug.Log("The player sent a message") ;
+                Debug.Log("The player sent a message");
             }
             else {
                 Debug.Log("The player did not send a message");
@@ -192,7 +194,23 @@ public class GameManager : MonoBehaviour {
 
         return color;
     }
-}
+    private void getObject() {
+        RaycastHit click;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Input.GetMouseButtonDown(0)) {
+            if (Physics.Raycast(ray, out click, 100.0f)) {
+                if (click.transform != null) {
+                    if (click.collider.gameObject.tag == "SlackButton") {
+
+                    }
+
+                }
+            }
+        }
+    } // end of getObject
+} // end of Class
+
 [System.Serializable]
 public class Message {
     public string text;
