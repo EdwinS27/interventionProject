@@ -9,8 +9,7 @@ public class GameManager : MonoBehaviour {
     public string userName;
     private int maxMessage = 50;
 
-    public GameObject slackMessageWindow, slackMessage;
-    //coverSlack
+    public GameObject slackMessageWindow, slackMessage, coverSlack;
     public InputField slackInputField;
 
     bool slackHidden = true;
@@ -33,6 +32,8 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+
+        trackMouse();
         if (slackInputField.text != "") {
             if (Input.GetKeyDown(KeyCode.Return)) {
                 SendMessageToChat(userName + ": " + slackInputField.text, Message.MessageType.playerMessage);
@@ -85,7 +86,22 @@ public class GameManager : MonoBehaviour {
         }
         return color;
     }
-}
+    private void trackMouse() {
+        // https://kylewbanks.com/blog/unity-2d-detecting-gameobject-clicks-using-raycasts
+        // How I learned to use raycast 2D
+        if (Input.GetMouseButtonDown(0)) {
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
+            Debug.Log("Mouse was clicked \n Mouse X: " + mousePos2D.x + " Mouse Y: " + mousePos2D.y);
+            if (mousePos2D.x > -10 && mousePos2D.x < -6 && mousePos2D.y < 5 && mousePos2D.y > 3) {
+                slackHidden = !slackHidden;
+                coverSlack.SetActive(slackHidden);
+            }
+        }
+    } // end of getObject
+
+
+} // end of Game Manager Class
 
 
 [System.Serializable]
