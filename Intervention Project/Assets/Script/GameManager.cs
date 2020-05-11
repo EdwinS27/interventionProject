@@ -43,9 +43,10 @@ public class GameManager : MonoBehaviour {
     public string userName;
     private int maxMessage = 50;
 
-    public GameObject chatPanel, textObject;
+    public GameObject chatPanel, textObject, slackWindow, coverSlack;
     public InputField chatBox;
-    public GameObject slackWindow;
+
+    bool slackHidden = true;
 
     public Color playerMessage;
     public Color info;
@@ -59,7 +60,7 @@ public class GameManager : MonoBehaviour {
     int currentMessageCount = 0;
     int previousMessageCount = 0;
     void Start() {
-        //slackWindow = 
+        coverSlack.SetActive(true);
     }
 
     // Update is called once per frame
@@ -195,16 +196,21 @@ public class GameManager : MonoBehaviour {
         return color;
     }
     private void getObject() {
-        RaycastHit click;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
+        // https://kylewbanks.com/blog/unity-2d-detecting-gameobject-clicks-using-raycasts
+        // How I learned to use raycast 2D
         if (Input.GetMouseButtonDown(0)) {
-            if (Physics.Raycast(ray, out click, 100.0f)) {
-                if (click.transform != null) {
-                    if (click.collider.gameObject.tag == "SlackButton") {
-
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            if (hit.collider != null) {
+                Debug.Log(hit.collider.gameObject.name);
+                hit.collider.attachedRigidbody.AddForce(Vector2.up);
+                if (hit.collider.gameObject.tag == "SlackButton") {
+                    if (slackHidden == true) {
+                        coverSlack.SetActive(false);
+                        slackHidden = false;
                     }
-
+                    else {
+                        coverSlack.SetActive(true);
+                    }
                 }
             }
         }
