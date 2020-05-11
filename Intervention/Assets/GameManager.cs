@@ -6,6 +6,39 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour {
+    string[] allQuestionsAnswers = {
+        "I'll call you in an hour",
+        "Let's do a zoom movie night!",
+        "We can meet on Discord at 4",
+        "Let's make a group chat",
+        "What time can you call?",
+        "Anyone want to meet over zoom"
+    };
+
+    string[] generalQuestions = { "What time can you call?", "Anyone want to meet over zoom" };
+    string[] generalResponses = {"I'll call you in an hour",
+        "Let's do a zoom movie night!",
+        "We can meet on Discord at 4",
+        "Let's make a group chat",
+        "What game are you playing?",
+        "Can I talk to you about the assignment later?",
+        "Do you want to work on the assignment together?",
+        "We can work on the assignment together"
+    };
+
+    string[] teacherResponses = { "Can't wait to see you all again!"
+    };
+
+    string[] gameQuestions = { "What game are you playing?"
+    };
+    string[] gameRespones = { "I love that game!"
+    };
+
+    string[] schoolQuestions = {"Can I talk to you about the assignment later?",
+        "Do you want to work on the assignment together?"};
+    string[] schoolRespones = { "We can work on the assignment together" };
+
+
     public string userName;
     private int maxMessage = 50;
 
@@ -32,7 +65,7 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-
+        BotCheckMessageAndRespond();
         trackMouse();
         if (slackInputField.text != "") {
             if (Input.GetKeyDown(KeyCode.Return)) {
@@ -79,10 +112,10 @@ public class GameManager : MonoBehaviour {
                 color = playerMessage;
                 break;
                 /*
-            case Message.MessageType.info:
-                color = info;
-                break;
-                */
+			case Message.MessageType.info:
+				color = info;
+				break;
+				*/
         }
         return color;
     }
@@ -101,7 +134,32 @@ public class GameManager : MonoBehaviour {
     } // end of getObject
 
 
-} // end of Game Manager Class
+    // This will be the game class mate
+    void BotCheckMessageAndRespond() {
+        // When a new message comes in we want to check that message and have the "BOT" respond
+        if (currentMessageCount > previousMessageCount) {
+            string messageCheck = messageList[currentMessageCount - 1].text;
+            if (messageList[currentMessageCount - 1].messageType == Message.MessageType.playerMessage) {
+                Debug.Log("The player sent a message so we need to respond");
+                // checking that the message had a question mark
+                if (messageCheck.Contains("?")) {
+                    Debug.Log("Check Message contains a ?");
+                    if (messageCheck.Contains("game") && messageCheck.Contains("playing")) {
+                        SendMessageToChat("Classmate: I am playing the founder", Message.MessageType.classMate);
+                    }
+                    if (messageCheck.Contains("assignment")) {
+                        SendMessageToChat("Classmate: I didn't know we had an assignment! \n RIP..", Message.MessageType.classMate);
+                    }
+                    else {
+
+                    }
+                }
+            }
+            // will need to create a function to make sure that the previous message was not sent by the bot.
+            previousMessageCount++;
+        }
+    }
+}// end of Game Manager Class
 
 
 [System.Serializable]
