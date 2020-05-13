@@ -84,6 +84,7 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        clearChat();
         activateChat(); // calls activateChat to know where each messsage should go.
         BotCheckMessageAndRespond();
         trackMouse();
