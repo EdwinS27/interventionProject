@@ -40,10 +40,11 @@ public class GameManager : MonoBehaviour {
     private int maxMessages = 25;
 
     public List<GameObject> messagingSystem;
-    public GameObject slackMessage, coverSlack, professorChat, classmateChat1, classmateChat2, classmateChat3, classmateChat4, classmateChat5;
+    public GameObject slackMessage, professorChat, classmateChat1, classmateChat2, classmateChat3, classmateChat4, classmateChat5, slackApp, gameApp, gameCam;
     public InputField slackInputField;
 
     bool slackHidden = true;
+    bool gameHidden = true;
 
     public Color playerMessage;
     public Color info;
@@ -81,6 +82,9 @@ public class GameManager : MonoBehaviour {
         classmateChat4.SetActive(false);
         classmateChat5.SetActive(false);
         professorChat.SetActive(true);
+        slackApp.SetActive(false);
+        gameApp.SetActive(false);
+        gameCam.SetActive(false);
     }
 
     // Update is called once per frame
@@ -200,11 +204,14 @@ public class GameManager : MonoBehaviour {
             if ((mousePos2D.x > -10 && mousePos2D.x < -6 && mousePos2D.y < 5 && mousePos2D.y > 3) ||
                 (mousePos2D.x > -7 && mousePos2D.x < -6 && mousePos2D.y < -2 && mousePos2D.y > -5)) {
                 slackHidden = !slackHidden;
-                coverSlack.SetActive(slackHidden);
+                slackApp.SetActive(slackHidden);
             }
             if (mousePos2D.x > -8.5f && mousePos2D.x < -7.2f && mousePos2D.y < 1.2f && mousePos2D.y > 0.2f) {
                 //Debug.Log("found the game");
-                SceneManager.LoadScene(2);
+                gameHidden = !gameHidden;
+                gameApp.SetActive(gameHidden);
+                gameCam.SetActive(gameHidden);
+
             }
             // For activating the professors chat
             if (mousePos2D.x > -0.5f && mousePos2D.x < 1.5f && mousePos2D.y < 4.2f && mousePos2D.y > 4) {

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -15,7 +16,8 @@ public class GamesManager : MonoBehaviour {
     //These are the variables that will set the enemy parameters. We are setting them in the GameManager because there is... 
     //...no enemy in the scene by default. They get created at runtime from the GameManager script (see SpawnEnemy() below)
 
-    int enemyHealth = 1;
+    private Vector3 origPos;
+
     public float initialEnemySpawnDelay;
     public float timeBetweenEnemySpawns;
 
@@ -23,17 +25,17 @@ public class GamesManager : MonoBehaviour {
 
     private int score;
 
-    public Text scoreText,gamesOver;
-
-    GameObject alien;
+    public Text scoreText, gamesOver;
 
     Player player;
+    GameObject alien;
+    GameObject playerS;
 
-    float xPos = 10.5f;
+    //Player player;
+
+    float xPos = -40f;
     float t;
-    bool gameOver = false;
-    bool gameDone = false;
-    float countdown = 0f;
+    public bool gamesGameOver = false;
     // Start is always called once at the start of the game, or when the object containing this script first becomes active. 
     private void Start() {
         //In Unity, when you put a Prefab in a folder called "Assets/Resources", you can then use a Resources.Load method that loads the prefab at runtime.
@@ -42,25 +44,30 @@ public class GamesManager : MonoBehaviour {
         t = initialEnemySpawnDelay;
         alien = Resources.Load<GameObject>("Alien") as GameObject;
         player = GameObject.Find("Player").GetComponent<Player>();
+        playerS = Resources.Load<GameObject>("Player") as GameObject;
         scoreText.enabled = true;
         gamesOver.enabled = false;
-
+        origPos = player.transform.position;
     }
 
     // In Unity, Update() is a function that runs every frame. 
     private void Update() {
-        if (gameDone == true) {
-            gamesOver.text = "GAME OVER";
+        if (gamesGameOver == true) {
+            gamesOver.text = "GAME OVER\nPress Space \nto Try Again";
             gamesOver.enabled = true;
-            countdown += Time.deltaTime;
         }
-        if (countdown > 5) {
-            SceneManager.LoadScene(1);
+        if ((Input.GetKeyDown(KeyCode.Space)) && gamesGameOver == true) {
+            GameObject players = Instantiate(playerS, origPos, playerS.transform.localRotation);
+            var player = players.GetComponent<Player>();
+            player.gamesDone = false;
+
+            gamesGameOver = false;
+            gamesOver.enabled = false;
+            score = 0;
         }
-        if (gameOver == false) {
-            //Debug.Log(player.playerLives);
-            // This is a basic timer for spawning enemies
-            //It uses the timeBetweenEnemySpawns value to space Spawning apart. We call SpawnEnemy() to do the actual spawning
+        if (gamesGameOver == false) {
+            player.playerLives = 1;
+            gamesOver.enabled = false;
             gameOn();
             if (t > 0) {
                 t -= Time.deltaTime;
@@ -70,16 +77,15 @@ public class GamesManager : MonoBehaviour {
                 t = timeBetweenEnemySpawns;
             }
         }
-
-        GameOver(); //
+        GameOver();
     }
     private void gameOn() {
         DisplayScores();
     }
     void SpawnEnemy() {
         var randPos = new System.Random(); // ?????
-        Vector2 pos = new Vector2(xPos, randPos.Next(-4, 4));
-        var randSpeed = randPos.Next(2, 10);
+        Vector2 pos = new Vector2(xPos, randPos.Next(20, 29));
+        var randSpeed = randPos.Next(2, 5);
         GameObject enemy = Instantiate(alien, pos, alien.transform.localRotation);
         var es = enemy.GetComponent<EnemySpawn>();
         es.moveSpeed = randSpeed;
@@ -89,11 +95,10 @@ public class GamesManager : MonoBehaviour {
     }
     public void GameOver() {
         if (player.playerLives == 0) {
-            gameOver = true;
-            gameDone = true;
+            gamesGameOver = true;
         }
     }
     void DisplayScores() {
-        scoreText.text = "Score  " + score + "000".ToString();
+        scoreText.text = "Score  " + score + "00".ToString();
     }
 }
