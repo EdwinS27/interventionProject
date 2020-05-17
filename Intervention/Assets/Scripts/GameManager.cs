@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour {
     int[] messagesSentCurr = { 0, 0, 0, 0, 0, 0, 0 };
 
     public List<GameObject> messagingSystem;
-    public GameObject slackMessage, professorChat, classmateChat1, classmateChat2, classmateChat3, classmateChat4, classmateChat5, slackApp, gameApp, gameCam;
+    public GameObject slackMessage, professorChat, classmateChat1, classmateChat2, classmateChat3, classmateChat4, classmateChat5, slackApp, gameApp;
     public InputField slackInputField;
     public Text currentlySpeaking;
 
@@ -73,7 +73,6 @@ public class GameManager : MonoBehaviour {
         professorChat.SetActive(true);
         slackApp.SetActive(false);
         gameApp.SetActive(false);
-        gameCam.SetActive(false);
         currentlySpeaking.enabled = true;
         currentlySpeaking.text = names[0];
     }
@@ -204,7 +203,6 @@ public class GameManager : MonoBehaviour {
                 //Debug.Log("found the game");
                 gameHidden = !gameHidden;
                 gameApp.SetActive(gameHidden);
-                gameCam.SetActive(gameHidden);
 
             }
             // For activating the professors chat
@@ -301,10 +299,10 @@ public class GameManager : MonoBehaviour {
                 string messageCheck = message.text.ToLower();
                 Debug.Log("messagetype " + message.messageType);
                 //Debug.Log("The player sent a message so we need to respond");
-                if (messageCheck.Contains("hello ") || messageCheck.Contains("hi ") || messageCheck.Contains("hello") || messageCheck.Contains("hi") || messageCheck.Contains("hey")) {
+                if (messageCheck.Contains("hello") || messageCheck.Contains("hi") || messageCheck.Contains("hey")) {
                     SendMessageToChat(names[0] + profResponse[0], 1);
                 }
-                if (messageCheck.Contains("help")|| messageCheck.Contains("assignment")) {
+                if (messageCheck.Contains("help") || messageCheck.Contains("assignment")) {
                     SendMessageToChat(names[0] + profResponse[1], 1);
                 }
                 if (messageCheck.Contains("error")) {
@@ -326,8 +324,10 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("game")) {
                     SendMessageToChat(names[0] + profResponse[7], 1);
                 }
-                if (messageCheck.Contains("assignment") || false || messageCheck.Contains("help") == false && messageCheck.Contains("hello") == false
-                   && messageCheck.Contains("hi") && messageCheck.Contains("hey") == false) {
+                if ((messageCheck.Contains("assignment") == false && messageCheck.Contains("help") == false && messageCheck.Contains("hello") == false
+                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("code") == false && messageCheck.Contains("repo") == false
+                    && messageCheck.Contains("meeting") == false && messageCheck.Contains("game") == false && messageCheck.Contains("error") == false &&
+                    messageCheck.Contains("thanks") == false) == true) {
                     SendMessageToChat(names[0] + profResponse[8], 1);
                 }
             }
@@ -342,11 +342,10 @@ public class GameManager : MonoBehaviour {
             if (message.messageType == 0) {
                 string messageCheck = message.text.ToLower();
                 if (messageCheck.Contains("hello ") || messageCheck.Contains("hi ") || messageCheck.Contains("hello") || messageCheck.Contains("hi") || messageCheck.Contains("hey")) {
-                    int randomResponse = Random.Range(0,3);
+                    int randomResponse = Random.Range(0, 3);
                     SendMessageToChat(names[1] + classmateResponse[randomResponse], 2);
                 }
                 if (messageCheck.Contains("movie")) {
-                    int randomResponse = Random.Range(0, 3);
                     SendMessageToChat(names[1] + classmateResponse[3], 2);
                 }
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("understand") && messageCheck.Contains("not") || messageCheck.Contains("didn")) {
@@ -358,8 +357,10 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("together")) {
                     SendMessageToChat(names[1] + classmateResponse[6], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate1Chat[messagesSentCurr[1]-2].text.Contains(classmateResponse[6])) {
-                    SendMessageToChat(names[1] + classmateResponse[7], 2);
+                if (messagesSentCurr[1] > 2) {
+                    if (messageCheck.Contains("yes") && classmate1Chat[messagesSentCurr[1] - 2].text.Contains(classmateResponse[6])) {
+                        SendMessageToChat(names[1] + classmateResponse[7], 2);
+                    }
                 }
                 if (messageCheck.Contains("game") && messageCheck.Contains("play") && messageCheck.Contains("do you")) {
                     SendMessageToChat(names[1] + gameResponse[0], 2);
@@ -370,12 +371,15 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("play") && messageCheck.Contains("together") || messageCheck.Contains("play?")) {
                     SendMessageToChat(names[1] + gameResponse[4], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate1Chat[messagesSentCurr[1] - 2].text.Contains(gameResponse[4])) {
-                    SendMessageToChat(names[1] + gameResponse[5], 2);
+                if (messagesSentCurr[1] > 2) {
+                    if (messageCheck.Contains("yes") && classmate1Chat[messagesSentCurr[1] - 2].text.Contains(gameResponse[4])) {
+                        SendMessageToChat(names[1] + gameResponse[5], 2);
+                    }
                 }
                 if ((messageCheck.Contains("assignment") == false && messageCheck.Contains("help") == false && messageCheck.Contains("hello") == false
-                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false && messageCheck.Contains("game") == false) == true) {
-                    SendMessageToChat(names[1] + classmateResponse[5], 2);
+                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false &&
+                   messageCheck.Contains("game") == false && messageCheck.Contains("movie") == false && messageCheck.Contains("play") == false) == true) {
+                    SendMessageToChat(names[1] + classmateResponse[8], 2);
                 }
                 //Debug.Log(classmate1Chat[messagesSentCurr[1] - 1].text);
             }
@@ -383,15 +387,14 @@ public class GameManager : MonoBehaviour {
         }
         // adjusting for 2
         if (messagesSentCurr[2] > messagesSentPrev[2]) {
-            var message = classmate1Chat[messagesSentCurr[2] - 1];
+            var message = classmate2Chat[messagesSentCurr[2] - 1];
             if (message.messageType == 0) {
                 string messageCheck = message.text.ToLower();
-                if (messageCheck.Contains("hello ") || messageCheck.Contains("hi ") || messageCheck.Contains("hello") || messageCheck.Contains("hi") || messageCheck.Contains("hey")) {
+                if (messageCheck.Contains("hello") || messageCheck.Contains("hi") || messageCheck.Contains("hey")) {
                     int randomResponse = Random.Range(0, 3);
                     SendMessageToChat(names[2] + classmateResponse[randomResponse], 2);
                 }
                 if (messageCheck.Contains("movie")) {
-                    int randomResponse = Random.Range(0, 3);
                     SendMessageToChat(names[2] + classmateResponse[3], 2);
                 }
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("understand") && messageCheck.Contains("not") || messageCheck.Contains("didn")) {
@@ -403,8 +406,10 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("together")) {
                     SendMessageToChat(names[2] + classmateResponse[6], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate1Chat[messagesSentCurr[1] - 2].text.Contains(classmateResponse[6])) {
-                    SendMessageToChat(names[2] + classmateResponse[7], 2);
+                if (classmate2Chat.Count > 2) {
+                    if (messageCheck.Contains("yes") && classmate2Chat[messagesSentCurr[2] - 2].text.Contains(classmateResponse[6])) {
+                        SendMessageToChat(names[2] + classmateResponse[7], 2);
+                    }
                 }
                 if (messageCheck.Contains("game") && messageCheck.Contains("play") && messageCheck.Contains("do you")) {
                     SendMessageToChat(names[2] + gameResponse[0], 2);
@@ -415,19 +420,22 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("play") && messageCheck.Contains("together") || messageCheck.Contains("play?")) {
                     SendMessageToChat(names[2] + gameResponse[4], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate2Chat[messagesSentCurr[1] - 2].text.Contains(gameResponse[4])) {
-                    SendMessageToChat(names[2] + gameResponse[5], 2);
+                if (classmate2Chat.Count > 2) {
+                    if (messageCheck.Contains("yes") && classmate2Chat[messagesSentCurr[2] - 2].text.Contains(gameResponse[4])) {
+                        SendMessageToChat(names[2] + gameResponse[5], 2);
+                    }
                 }
                 if ((messageCheck.Contains("assignment") == false && messageCheck.Contains("help") == false && messageCheck.Contains("hello") == false
-                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false && messageCheck.Contains("game") == false) == true) {
-                    SendMessageToChat(names[2] + classmateResponse[5], 2);
+                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false
+                   && messageCheck.Contains("game") == false && messageCheck.Contains("movie") == false) == true) {
+                    SendMessageToChat(names[2] + classmateResponse[8], 2);
                 }
             }
             messagesSentPrev[2] = messagesSentPrev[2] + 1;
         }
         // adjusting for 3
         if (messagesSentCurr[3] > messagesSentPrev[3]) {
-            var message = classmate1Chat[messagesSentCurr[3] - 1];
+            var message = classmate3Chat[messagesSentCurr[3] - 1];
             string messageCheck = message.text.ToLower();
             if (message.messageType == 0) {
                 if (messageCheck.Contains("hello ") || messageCheck.Contains("hi ") || messageCheck.Contains("hello") || messageCheck.Contains("hi") || messageCheck.Contains("hey")) {
@@ -447,8 +455,10 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("together")) {
                     SendMessageToChat(names[3] + classmateResponse[6], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate1Chat[messagesSentCurr[1] - 2].text.Contains(classmateResponse[6])) {
-                    SendMessageToChat(names[3] + classmateResponse[7], 2);
+                if (classmate3Chat.Count > 2) {
+                    if (messageCheck.Contains("yes") && classmate3Chat[messagesSentCurr[3] - 2].text.Contains(classmateResponse[6])) {
+                        SendMessageToChat(names[3] + classmateResponse[7], 2);
+                    }
                 }
                 if (messageCheck.Contains("game") && messageCheck.Contains("play") && messageCheck.Contains("do you")) {
                     SendMessageToChat(names[3] + gameResponse[0], 2);
@@ -459,19 +469,22 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("play") && messageCheck.Contains("together") || messageCheck.Contains("play?")) {
                     SendMessageToChat(names[3] + gameResponse[4], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate3Chat[messagesSentCurr[1] - 2].text.Contains(gameResponse[4])) {
-                    SendMessageToChat(names[3] + gameResponse[5], 2);
+                if (classmate3Chat.Count > 1) {
+                    if (messageCheck.Contains("yes") && classmate3Chat[messagesSentCurr[3] - 2].text.Contains(gameResponse[4])) {
+                        SendMessageToChat(names[3] + gameResponse[5], 2);
+                    }
                 }
                 if ((messageCheck.Contains("assignment") == false && messageCheck.Contains("help") == false && messageCheck.Contains("hello") == false
-                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false && messageCheck.Contains("game") == false) == true) {
-                    SendMessageToChat(names[3] + classmateResponse[5], 2);
+                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false
+                   && messageCheck.Contains("game") == false && messageCheck.Contains("movie") == false) == true) {
+                    SendMessageToChat(names[3] + classmateResponse[8], 2);
                 }
             }
             messagesSentPrev[3] = messagesSentPrev[3] + 1;
         }
         // adjusting for 4
         if (messagesSentCurr[4] > messagesSentPrev[4]) {
-            var message = classmate1Chat[messagesSentCurr[4] - 1];
+            var message = classmate4Chat[messagesSentCurr[4] - 1];
             if (message.messageType == 0) {
                 string messageCheck = message.text.ToLower();
                 if (messageCheck.Contains("hello ") || messageCheck.Contains("hi ") || messageCheck.Contains("hello") || messageCheck.Contains("hi")) {
@@ -479,7 +492,6 @@ public class GameManager : MonoBehaviour {
                     SendMessageToChat(names[4] + classmateResponse[randomResponse], 2);
                 }
                 if (messageCheck.Contains("movie")) {
-                    int randomResponse = Random.Range(0, 3);
                     SendMessageToChat(names[4] + classmateResponse[3], 2);
                 }
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("understand") && messageCheck.Contains("not") || messageCheck.Contains("didn")) {
@@ -491,8 +503,10 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("together")) {
                     SendMessageToChat(names[4] + classmateResponse[6], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate4Chat[messagesSentCurr[1] - 2].text.Contains(classmateResponse[6])) {
-                    SendMessageToChat(names[4] + classmateResponse[7], 2);
+                if (classmate4Chat.Count > 1) {
+                    if (messageCheck.Contains("yes") && classmate4Chat[messagesSentCurr[4] - 2].text.Contains(classmateResponse[6])) {
+                        SendMessageToChat(names[4] + classmateResponse[7], 2);
+                    }
                 }
                 if (messageCheck.Contains("game") && messageCheck.Contains("play") && messageCheck.Contains("do you")) {
                     SendMessageToChat(names[4] + gameResponse[0], 2);
@@ -503,11 +517,14 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("play") && messageCheck.Contains("together") || messageCheck.Contains("play?")) {
                     SendMessageToChat(names[4] + gameResponse[4], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate4Chat[messagesSentCurr[1] - 2].text.Contains(gameResponse[4])) {
-                    SendMessageToChat(names[4] + gameResponse[5], 2);
+                if (classmate4Chat.Count > 1) {
+                    if (messageCheck.Contains("yes") && classmate4Chat[messagesSentCurr[4] - 2].text.Contains(gameResponse[4])) {
+                        SendMessageToChat(names[4] + gameResponse[5], 2);
+                    }
                 }
                 if ((messageCheck.Contains("assignment") == false && messageCheck.Contains("help") == false && messageCheck.Contains("hello") == false
-                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false && messageCheck.Contains("game") == false) == true) {
+                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false
+                   && messageCheck.Contains("game") == false && messageCheck.Contains("movie") == false) == true) {
                     SendMessageToChat(names[4] + classmateResponse[8], 2);
                 }
             }
@@ -515,15 +532,14 @@ public class GameManager : MonoBehaviour {
         }
         // adjusting for 5
         if (messagesSentCurr[5] > messagesSentPrev[5]) {
-            var message = classmate1Chat[messagesSentCurr[5] - 1];
+            var message = classmate5Chat[messagesSentCurr[5] - 1];
             if (message.messageType == 0) {
                 string messageCheck = message.text.ToLower();
                 if (messageCheck.Contains("hello ") || messageCheck.Contains("hi ") || messageCheck.Contains("hello") || messageCheck.Contains("hi") || messageCheck.Contains("hey")) {
                     int randomResponse = Random.Range(0, 3);
-                    SendMessageToChat(names[4] + classmateResponse[randomResponse], 2);
+                    SendMessageToChat(names[5] + classmateResponse[randomResponse], 2);
                 }
                 if (messageCheck.Contains("movie")) {
-                    int randomResponse = Random.Range(0, 3);
                     SendMessageToChat(names[5] + classmateResponse[3], 2);
                 }
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("understand") && messageCheck.Contains("not") || messageCheck.Contains("didn")) {
@@ -535,24 +551,29 @@ public class GameManager : MonoBehaviour {
                 if (messageCheck.Contains("assignment") && messageCheck.Contains("together")) {
                     SendMessageToChat(names[5] + classmateResponse[6], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate1Chat[messagesSentCurr[1] - 2].text.Contains(classmateResponse[6])) {
-                    SendMessageToChat(names[5] + classmateResponse[7], 2);
+                if (classmate5Chat.Count > 2) {
+                    if (messageCheck.Contains("yes") && classmate5Chat[messagesSentCurr[5] - 2].text.Contains(classmateResponse[6])) {
+                        SendMessageToChat(names[5] + classmateResponse[7], 2);
+                    }
                 }
                 if (messageCheck.Contains("game") && messageCheck.Contains("play") && messageCheck.Contains("do you")) {
-                    SendMessageToChat(names[4] + gameResponse[0], 2);
+                    SendMessageToChat(names[5] + gameResponse[0], 2);
                 }
                 if (messageCheck.Contains("game") || messageCheck.Contains("games")) {
-                    SendMessageToChat(names[4] + gameResponse[1], 2);
+                    SendMessageToChat(names[5] + gameResponse[1], 2);
                 }
                 if (messageCheck.Contains("play") && messageCheck.Contains("together") || messageCheck.Contains("play?")) {
-                    SendMessageToChat(names[4] + gameResponse[4], 2);
+                    SendMessageToChat(names[5] + gameResponse[4], 2);
                 }
-                if (messageCheck.Contains("yes") && classmate4Chat[messagesSentCurr[1] - 2].text.Contains(gameResponse[4])) {
-                    SendMessageToChat(names[4] + gameResponse[5], 2);
+                if (classmate5Chat.Count > 2) {
+                    if (messageCheck.Contains("yes") && classmate5Chat[messagesSentCurr[5] - 2].text.Contains(gameResponse[4])) {
+                        SendMessageToChat(names[5] + gameResponse[5], 2);
+                    }
                 }
                 if ((messageCheck.Contains("assignment") == false && messageCheck.Contains("help") == false && messageCheck.Contains("hello") == false
-                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false) == true) {
-                    SendMessageToChat(names[4] + classmateResponse[5], 2);
+                   && messageCheck.Contains("hi") == false && messageCheck.Contains("hey") == false && messageCheck.Contains("yes") == false
+                   && messageCheck.Contains("movie") == false) == true) {
+                    SendMessageToChat(names[5] + classmateResponse[8], 2);
                 }
             }
             messagesSentPrev[5] = messagesSentPrev[5] + 1;
